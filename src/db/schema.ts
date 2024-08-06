@@ -6,6 +6,7 @@ import {
     primaryKey,
     integer,
     serial,
+    numeric,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters"
 
@@ -15,6 +16,7 @@ export const items = pgTable('bb_item', {
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),
     name: text('name').notNull(),
+    startingPrice: numeric('startingPrice').notNull(),
 })
 
 
@@ -75,26 +77,26 @@ export const verificationTokens = pgTable(
 )
 
 
-export const authenticators = pgTable(
-    "bb_authenticator",
-    {
-        credentialID: text("credentialID").notNull().unique(),
-        userId: text("userId")
-            .notNull()
-            .references(() => users.id, { onDelete: "cascade" }),
-        providerAccountId: text("providerAccountId").notNull(),
-        credentialPublicKey: text("credentialPublicKey").notNull(),
-        counter: integer("counter").notNull(),
-        credentialDeviceType: text("credentialDeviceType").notNull(),
-        credentialBackedUp: boolean("credentialBackedUp").notNull(),
-        transports: text("transports"),
-    },
-    (authenticator) => ({
-        compositePK: primaryKey({
-            columns: [authenticator.userId, authenticator.credentialID],
-        }),
-    })
-)
+// export const authenticators = pgTable(
+//     "bb_authenticator",
+//     {
+//         credentialID: text("credentialID").notNull().unique(),
+//         userId: text("userId")
+//             .notNull()
+//             .references(() => users.id, { onDelete: "cascade" }),
+//         providerAccountId: text("providerAccountId").notNull(),
+//         credentialPublicKey: text("credentialPublicKey").notNull(),
+//         counter: integer("counter").notNull(),
+//         credentialDeviceType: text("credentialDeviceType").notNull(),
+//         credentialBackedUp: boolean("credentialBackedUp").notNull(),
+//         transports: text("transports"),
+//     },
+//     (authenticator) => ({
+//         compositePK: primaryKey({
+//             columns: [authenticator.userId, authenticator.credentialID],
+//         }),
+//     })
+// )
 
 
 export const bids = pgTable('bb_bids', {
