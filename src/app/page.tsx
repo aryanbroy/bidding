@@ -1,17 +1,11 @@
-import Image from "next/image";
-import { database } from "@/db/database";
-import { bids as bidsSchema, items } from "@/db/schema";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { revalidatePath } from "next/cache";
-import { SignIn } from "@/components/sign-in";
-import { SignOut } from "@/components/signout-button";
 import { auth } from "@/auth";
+import { database } from "@/db/database";
+import Image from "next/image";
+import ItemCard from "./items-card";
 
 export default async function Home() {
 
   const allItems = await database.query.items.findMany();
-
   const session = await auth();
 
   return (
@@ -23,11 +17,7 @@ export default async function Home() {
       <div className="grid grid-cols-4 gap-8">
 
         {allItems?.map((item) => (
-          <div key={item.id} className="border p-8 rounded-xl">
-            <p>{item.name}</p>
-
-            <p>starting price : ${item.startingPrice}</p>
-          </div>
+          <ItemCard key={item.id} item={item} />
         ))}
 
       </div>

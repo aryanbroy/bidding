@@ -17,6 +17,7 @@ export const items = pgTable('bb_item', {
         .references(() => users.id, { onDelete: "cascade" }),
     name: text('name').notNull(),
     startingPrice: numeric('startingPrice').notNull(),
+    image: text('image').notNull(),
 })
 
 
@@ -103,3 +104,4 @@ export const bids = pgTable('bb_bids', {
     id: serial('id').primaryKey(),
 });
 
+export type Item = typeof items.$inferSelect;
