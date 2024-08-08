@@ -4,6 +4,7 @@ import ItemCard from '../items-card'
 import { eq } from 'drizzle-orm'
 import { items } from '@/db/schema'
 import { EmptyState } from './empty-state'
+import { pageTitleStyles } from '@/styles'
 
 export default async function Home() {
   const session = await auth()
@@ -19,8 +20,8 @@ export default async function Home() {
   const hasItems = allItems.length > 0
 
   return (
-    <main className="container mx-auto py-12 space-y-8">
-      <h1 className="text-4xl font-bold">My Auctions</h1>
+    <main className="space-y-8">
+      <h1 className={pageTitleStyles}>My Auctions</h1>
       {hasItems ? (
         <div className="grid grid-cols-4 gap-8">
           {allItems?.map((item) => <ItemCard key={item.id} item={item} />)}
