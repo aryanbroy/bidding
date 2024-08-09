@@ -3,6 +3,7 @@ import { Item } from '@/db/schema'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { formatToDollar } from '@/utils/currency'
 
 export default function ItemCard({ item }: { item: Item }) {
   return (
@@ -10,7 +11,7 @@ export default function ItemCard({ item }: { item: Item }) {
       <Image src={item.image} alt={item.name} width={400} height={200} />
       <p className="text-xl font-bold">{item.name}</p>
 
-      <p className="text-lg">starting price : ${item.startingPrice}</p>
+      <p className="text-lg">starting price : ${formatToDollar(item.startingPrice)}</p>
       <Button asChild>
         <Link href={`/items/${item.id}`}>Place Bid</Link>
       </Button>
