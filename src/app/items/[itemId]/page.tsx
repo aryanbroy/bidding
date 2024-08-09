@@ -9,15 +9,20 @@ import { formatDistance } from 'date-fns'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createBidAction } from './actions'
+import { auth } from '@/auth'
 
 function formatTimestamp(timeStamp: Date) {
   return formatDistance(timeStamp, new Date(), { addSuffix: true })
 }
 
 export default async function ItemPage({ params: { itemId } }: { params: { itemId: string } }) {
+  const session = await auth()
+
   const allBids = await getBidsForItem(parseInt(itemId))
 
   const item = await getItem(parseInt(itemId))
+
+  const canPlaceBid = session && item?.userId !== session.user.id
 
   if (!item) {
     return (
@@ -60,9 +65,11 @@ export default async function ItemPage({ params: { itemId } }: { params: { itemI
         <div className="space-y-4 flex-1">
           <div className="flex justify-between">
             <h2 className="text-2xl font-bold">Current Bids</h2>
-            <form action={createBidAction.bind(null, item.id)}>
-              <Button>Place a Bid</Button>
-            </form>
+            {canPlaceBid && (
+              <form action={createBidAction.bind(null, item.id)}>
+                <Button>Place a Bid</Button>
+              </form>
+            )}
           </div>
           {allBids.length > 0 ? (
             <ul className="space-y-4">
@@ -82,9 +89,11 @@ export default async function ItemPage({ params: { itemId } }: { params: { itemI
             <div className="flex flex-col items-center gap-2 rounded-xl p-12">
               <Image src="/void.svg" width={200} height={200} alt="Void" />
               <h2 className="text-2xl font-bold">No bids yet!</h2>
-              <form action={createBidAction.bind(null, item.id)}>
-                <Button>Place a Bid</Button>
-              </form>
+              {canPlaceBid && (
+                <form action={createBidAction.bind(null, item.id)}>
+                  <Button>Place a Bid</Button>
+                </form>
+              )}
             </div>
           )}
         </div>

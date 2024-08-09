@@ -1,12 +1,16 @@
-import { auth } from '@/auth';
-import { SignIn } from '@/components/sign-in';
-import { SignOut } from '@/components/signout-button';
-import Image from 'next/image';
-import Link from 'next/link';
-import React from 'react';
+'use client'
+import { Button } from '@/components/ui/button'
+import { NotificationCell, NotificationFeedPopover, NotificationIconButton } from '@knocklabs/react'
+import { signIn, signOut, useSession } from 'next-auth/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRef, useState } from 'react'
 
-export default async function Header() {
-  const session = await auth();
+export default function Header() {
+  const [isVisible, setIsVisible] = useState(false)
+  const notifButtonRef = useRef(null)
+  const session = useSession()
+  const userId = session.data?.user?.id
   return (
     <div className="bg-gray-200 py-2">
       <div className="container flex justify-between items-center">
@@ -17,31 +21,64 @@ export default async function Header() {
           </Link>
 
           <div className="flex items-center gap-8">
-            <Link
-              href={'/'}
-              className="flex items-center gap-1 hover:underline"
-            >
+            <Link href={'/'} className="flex items-center gap-1 hover:underline">
               All Auctions
             </Link>
-            <Link
-              href={'/items/create'}
-              className="flex items-center gap-1 hover:underline"
-            >
-              Create Auction
-            </Link>
-            <Link
-              href={'/auctions'}
-              className="flex items-center gap-1 hover:underline"
-            >
-              My Auctions
-            </Link>
+            {userId && (
+              <>
+                <Link href={'/items/create'} className="flex items-center gap-1 hover:underline">
+                  Create Auction
+                </Link>
+                <Link href={'/auctions'} className="flex items-center gap-1 hover:underline">
+                  My Auctions
+                </Link>
+              </>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <div>{session?.user?.name}</div>
-          <div>{session ? <SignOut /> : <SignIn />}</div>
+          <div>
+            <NotificationIconButton
+              ref={notifButtonRef}
+              onClick={(e) => setIsVisible(!isVisible)}
+            />
+            <NotificationFeedPopover
+              buttonRef={notifButtonRef}
+              isVisible={isVisible}
+              onClose={() => setIsVisible(false)}
+              renderItem={({ item, ...props }) => (
+                <NotificationCell {...props} item={item}>
+                  <div onClick={() => setIsVisible(false)}>
+                    <Link href={`/items/${item?.data?.itemId}`}>
+                      Someone outbidded you on
+                      <span className="font-bold"> {item?.data?.itemName}</span>!
+                    </Link>
+                  </div>
+                </NotificationCell>
+              )}
+            />
+          </div>
+          <div>{session?.data?.user?.name}</div>
+          <div>
+            {userId ? (
+              <Button
+                type="submit"
+                onClick={() =>
+                  signOut({
+                    callbackUrl: '/'
+                  })
+                }
+              >
+                Sign Out
+              </Button>
+            ) : (
+              <Button type="submit" onClick={() => signIn()}>
+                Sign in
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
